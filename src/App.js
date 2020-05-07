@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Navbar from './Components/layout/Navbar';
 import Users from './Components/user/Users';
 import User from './Components/user/User';
@@ -7,71 +7,67 @@ import Search from './Components/user/Search';
 import Alert from './Components/user/Alert';
 import { Route, Switch } from 'react-router-dom';
 import About from './Components/pages/About';
-import axios from 'axios';
+import GithubProvider from './context/GithubContext';
+
 import './App.css';
+import NotFound from './notfound';
 
-class App extends Component {
-  state = {
-    users: [],
-    loading: false,
-    alert: null,
-  };
-
-  searchUser = async (text) => {
-    this.setState({ loading: true });
-    const res = await axios.get(
-      `https://api.github.com/search/users?q=${text}`
-    );
-    this.setState({
-      users: res.data.items,
-      loading: false,
-    });
-  };
-
-  clearUser = () => {
-    this.setState({
-      users: [],
-      loading: false,
-    });
-  };
-
-  setAlert = (msg, type) => {
-    this.setState({ alert: { msg, type } });
-    setTimeout(() => {
-      this.setState({ alert: null });
-    }, 3000);
-  };
-  render() {
-    const { users, loading } = this.state;
-    return (
+const App = (props) => {
+  return (
+    <GithubProvider>
       <div className='App'>
         <Navbar />
         <div className='container'>
-          <Alert alert={this.state.alert} />
+          <Alert />
           <Switch>
             <Route
               exact
               path='/'
               render={() => (
                 <div>
-                  <Search
-                    searchUser={this.searchUser}
-                    clearUser={this.clearUser}
-                    showClearUser={users.length > 0 ? true : false}
-                    setAlert={this.setAlert}
-                  />
-                  <Users loading={loading} users={users} />
+                  <Search />
+                  <Users />
                 </div>
               )}
             />
             <Route exact path='/about' component={About} />
             <Route exact path='/user/:login' component={User} />
             <Route exact path='/user/:login/repos' component={UserRepos} />
+            <Route exact path='/:notfound' component={NotFound} />
           </Switch>
         </div>
       </div>
-    );
-  }
-}
+    </GithubProvider>
+  );
+};
 
 export default App;
+
+// const searchUser = async ( text ) =>
+// {
+//   setloading( true );
+//   const res = await axios.get(
+//     `https://api.github.com/search/users?q=${ text }`
+//   );
+//   setUsers( res.data.items );
+//   setloading( false );
+// };
+
+// const clearUser = () =>
+// {
+//   setUsers( [] );
+//   setloading( false );
+// };
+
+// const setalert = ( msg, type ) =>
+// {
+//   setAlert( { msg, type } );
+//   setTimeout( () =>
+//   {
+//     setAlert( null );
+//   }, 3000 );
+// };
+
+// const [ users, setUsers ] = useState( [] );
+// const [ alert, setAlert ] = useState( null );
+// const [ loading, setloading ] = useState( false );
